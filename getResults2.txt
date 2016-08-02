@@ -1,0 +1,33 @@
+rnum = "100_1"
+
+prefix = "/media/gwendolyn/SLIMER\ DATA/Run";
+ext = ".tif";
+total = prefix + rnum + "/Pos0/"
+subtotal = prefix + rnum + "/"
+
+m=8000;
+n=9999;
+
+setBatchMode(true);
+
+var area, mean, min, max;
+
+for(i = m; i<=n; i++){
+     if(i<10){filename = "img_00000000";}
+     else if(i<100){filename = "img_0000000";}
+     else if(i<1000){filename = "img_000000";}
+     else if(i<10000){filename = "img_00000";}
+     else {filename = "img_0000";}
+     open(subtotal + "blur/" + filename + i + "smooth" + ext);
+
+     getStatistics(area, mean, min, max);
+     setThreshold(170, max);
+     run("Set Measurements...", "area mean min centroid integrated limit redirect=None decimal=3");
+     run("Analyze Particles...", "size=0-Infinity circularity=0.00-1.00 show=Nothing display");
+
+}
+
+saveAs("Results", subtotal + "Results-" + rnum + "-th170.txt");
+     close();
+setBatchMode(false);
+

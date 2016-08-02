@@ -1,0 +1,29 @@
+rnum = "100_1"
+
+prefix = "/media/gwendolyn/SLIMER\ DATA/Run";
+ext = ".tif";
+total = prefix + rnum + "/Pos0/";
+
+m=0;
+n=9999;
+
+setBatchMode(true);
+
+for(i = m; i<=n; i++){
+     if(i<10){filename = "img_00000000";}
+     else if(i<100){filename = "img_0000000";}
+     else if(i<1000){filename = "img_000000";}
+     else if(i<10000){filename = "img_00000";}
+     else {filename = "img_0000";}
+     open(total + filename + i +"_Default_000"+ext);
+}
+
+
+run("Images to Stack", "name=Stack title=img use keep");
+
+selectWindow("Stack");
+run("Z Project...", "start=1 stop=n projection=[Average Intensity]");
+
+saveAs("Tiff", total + rnum + "_avg" + ext);
+
+setBatchMode(false);

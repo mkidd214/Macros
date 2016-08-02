@@ -1,0 +1,27 @@
+rnum = "100_1"
+
+prefix = "/media/gwendolyn/SLIMER\ DATA/Run";
+ext = ".tif";
+total = prefix + rnum + "/Pos0/"
+subtotal = prefix + rnum + "/"
+
+m=5000;
+n=9999;
+
+setBatchMode(true);
+
+for(i = m; i<=n; i++){
+     if(i<10){filename = "img_00000000";}
+     else if(i<100){filename = "img_0000000";}
+     else if(i<1000){filename = "img_000000";}
+     else if(i<10000){filename = "img_00000";}
+     else {filename = "img_0000";}
+     open(subtotal + "sub/" + filename + i + "sub" + ext);
+    
+    // run("Bin...", "x=4 y=4 bin=Sum");
+     run("Gaussian Blur...", "sigma=1.20");
+     saveAs("Tiff", subtotal + "blur/" + filename + i + "smooth" + ext);
+     close();
+}
+
+setBatchMode(false);

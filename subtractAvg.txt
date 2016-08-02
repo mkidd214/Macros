@@ -1,0 +1,32 @@
+rnum = "100_1"
+
+prefix = "/media/gwendolyn/SLIMER\ DATA/Run";
+ext = ".tif";
+total = prefix + rnum + "/Pos0/";
+subtotal = prefix + rnum + "/";
+
+
+// break into groups to improve speed...
+m=8000;
+n=9999;
+
+setBatchMode(true);
+
+avgfilename = rnum + "_avg"+ext;
+
+open(total + avgfilename);
+for(i = m; i<=n; i++){
+     if(i<10){filename = "img_00000000";}
+     else if(i<100){filename = "img_0000000";}
+     else if(i<1000){filename = "img_000000";}
+     else if(i<10000){filename = "img_00000";}
+     else {filename = "img_0000";}
+     open(total + filename + i +"_Default_000"+ext);
+
+     imageCalculator("Subtract create", filename + i + "_Default_000" + ext, avgfilename);
+     saveAs("Tiff", subtotal + "sub/" + filename + i + "sub" + ext);
+     selectWindow(filename + i + "_Default_000" + ext);
+     close();
+}
+
+setBatchMode(false);
