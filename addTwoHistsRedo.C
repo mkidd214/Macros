@@ -9,29 +9,57 @@
 	#include <string>
 	
 	double YEabs, SrEabs, AddedEabs;
-	
-	TFile *f1 = new TFile("/home/gwendolyn/Things/Fall2015_Research/code_build/Y.root");
-	TFile *f2 = new TFile("/home/gwendolyn/Things/Fall2015_Research/code_build/Sr.root");
-	TTree *t1 = (TTree*)f1->Get("Y");
-	TTree *t2 = (TTree*)f2->Get("Sr");
+	TFile *f1 = new TFile("~/Downloads/Y.root");
+	TFile *f2 = new TFile("~/Downloads/Sr.root");
+	TTree *t1 = (TTree*)f1->Get("file");
+	TTree *t2 = (TTree*)f2->Get("file");
 	t1->SetBranchAddress("Eabs", &YEabs);
 	t2->SetBranchAddress("Eabs", &SrEabs);
 	
+	TChain chain("file"); // name of the tree is the argument
+	chain.Add("~/Downloads/Y.root");
+	chain.Add("~/Downloads/Sr.root");
+	
+	chain.SetBranchAddress("Eabs", &TotalEabs);
+
 	TFile *f = new TFile("tree1.root","recreate");
 	TTree *tree = new TTree("tree","added absorbed energies");
-	tree->Branch("YEabs",&YEabs,"YEabs");
-	tree->Branch("SrEabs",&SrEabs,"SrEabs");
-	tree->Branch("AddedEabs",&AddedEabs,"AddedEabs");
+	tree->Branch("AddedEabs",&temp,"temp/D");
 	
-	//fill the tree
-	for (int i = 0; i < 200000; i++) {
+	TH1D *hTot = new TH1D("hTot","Total",1000,0,1000);
+	TH1D *hSr = new TH1D("hSr","Sr",1000,0,1000);	
+	TH1D *hY = new TH1D("hY","Y",1000,0,1000);
+		
+	int nEntries = chain.GetEntries();
+	
+	//fill the histogram
+	for (int i = 0; i < nEntries; i++) {
+		//get variables from other .root files
+		chain->GetEntry(i);
+		temp = TotalEabs;
+		hTot->Fill(TotalEabs);
+		tree->Fill();
+
+	}
+	
+	nEntries = t1->GetEntries();
+	for (i = 0; i < nEntries; i++) {
 		//get variables from other .root files
 		t1->GetEntry(i);
 		t2->GetEntry(i);
-		AddedEabs = YEabs + SrEabs;
-		
-		//add them to the new ttree
-		tree->Fill();
+		hSr->Fill(SrEabs);
+		hY->Fill(YEabs);
 	}
-	tree->Write();
+	
+
+new TCanvas();
+hTot->SetLineColor(1);
+hSr->SetLineColor(2);
+hY->SetLineColor(3);
+hTot->Draw();
+hSr->Draw("same");
+hY->Draw("same");
+
+tree->Write();
+
 }
